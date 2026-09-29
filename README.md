@@ -3022,3 +3022,129 @@ CSS3
 
 ESLint
 
+
+
+DEPLOYMENT
+
+The Task Manager application is deployed using the following services:
+
+1. Frontend Deployment
+
+The React + TypeScript frontend is deployed on Vercel.
+
+Production URL:
+https://task-manager-frontend-topaz-ten.vercel.app/
+
+Frontend deployment configuration:
+
+* Platform: Vercel
+* Framework: Vite
+* Root directory: frontend
+* Build command: npm run build
+* Output directory: dist
+
+The frontend uses Vite environment variables for the Firebase Web SDK configuration and the production NestJS API URL.
+
+2. Backend Deployment
+
+The NestJS + TypeScript backend is deployed on Render.
+
+Production API URL:
+https://task-manager-backend-2e4g.onrender.com
+
+Backend deployment configuration:
+
+* Platform: Render
+* Service type: Web Service
+* Runtime: Node.js
+* Root directory: backend
+* Build command: npm install && npm run build
+* Start command: npm run start:prod
+
+The backend uses environment variables for Firebase Admin SDK credentials and the production frontend origin. Firebase Admin credentials are not stored in the Git repository.
+
+3. Database and Authentication
+
+Firebase is used for authentication and database services.
+
+Firebase services used:
+
+* Firebase Authentication with Email/Password authentication
+* Cloud Firestore
+
+The Firestore database is hosted in the africa-south1 region.
+
+Firestore client-side access is disabled. Task data is accessed through the NestJS backend using the Firebase Admin SDK.
+
+4. Production Authentication and Authorization
+
+Users authenticate through Firebase Authentication in the React frontend.
+
+After authentication, the frontend obtains a Firebase ID token and sends it to the NestJS backend using the Authorization header:
+
+Authorization: Bearer <Firebase ID token>
+
+The NestJS AuthGuard verifies the token using the Firebase Admin SDK.
+
+The authenticated Firebase user ID is then used to authorize access to tasks. Users can only retrieve, update, and delete tasks belonging to their own account.
+
+5. CORS Configuration
+
+The production backend is configured to accept requests from the deployed Vercel frontend.
+
+The FRONTEND_URL environment variable is configured on Render as:
+
+https://task-manager-frontend-topaz-ten.vercel.app
+
+This prevents the production API from relying on the localhost development frontend origin.
+
+6. Environment Variables
+
+Development and production secrets are kept outside the Git repository using environment variables.
+
+Frontend environment variables include:
+
+* VITE_FIREBASE_API_KEY
+* VITE_FIREBASE_AUTH_DOMAIN
+* VITE_FIREBASE_PROJECT_ID
+* VITE_FIREBASE_STORAGE_BUCKET
+* VITE_FIREBASE_MESSAGING_SENDER_ID
+* VITE_FIREBASE_APP_ID
+* VITE_API_URL
+
+Backend environment variables include:
+
+* PORT
+* FIREBASE_PROJECT_ID
+* FIREBASE_CLIENT_EMAIL
+* FIREBASE_PRIVATE_KEY
+* FRONTEND_URL
+
+Actual secret values are not included in the repository.
+
+7. Deployment Architecture
+
+The production application follows this architecture:
+
+User
+|
+v
+Vercel React Frontend
+|
+| Firebase ID Token
+v
+Render NestJS Backend
+|
+| Firebase Admin SDK
+v
+Firebase Authentication / Cloud Firestore
+
+8. Deployment Limitations
+
+The project uses free hosting services for the assessment.
+
+The Render free service may temporarily spin down after periods of inactivity. The first request after inactivity may therefore take longer while the backend service starts again.
+
+The deployment is intended for assessment and demonstration purposes rather than high-volume production traffic.
+
+
